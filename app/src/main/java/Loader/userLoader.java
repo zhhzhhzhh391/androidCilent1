@@ -1,15 +1,9 @@
 package Loader;
 
-import android.graphics.Movie;
-
 import java.util.ArrayList;
-import java.util.List;
 
-import Loader.ObjectLoader;
-import Loader.payLoader;
-import bean.BaseResponse;
-import bean.userBean;
-import bean.userInfoBean;
+import commonObj.userInfoObj;
+import commonObj.userObj;
 import okhttp3.RequestBody;
 import rx.Observable;
 import rx.functions.Func1;
@@ -28,15 +22,15 @@ public class userLoader extends ObjectLoader {
      *
      * @return
      */
-    public Observable<ArrayList<userBean>> getAllUser(){
+    public Observable<ArrayList<userObj>> getAllUser(){
         return observe(mUserAbout.getAllUser())
-                .map(new Func1<userInfoBean, ArrayList<userBean>>() {
+                .map(new Func1<userInfoObj, ArrayList<userObj>>() {
                     @Override
-                    public ArrayList<userBean> call(userInfoBean userInfoBean) {
-                        if(userInfoBean.getCount() == 0){
+                    public ArrayList<userObj> call(userInfoObj userInfoObj) {
+                        if(userInfoObj.getCount() == 0){
                             return null;
                         }
-                        return userInfoBean.getResults();
+                        return userInfoObj.getResults();
                     }
                 });
 //                .map(new payLoader<BaseResponse<userInfoBean>>());
@@ -45,12 +39,12 @@ public class userLoader extends ObjectLoader {
     /**
      *获取指定的用户数据
      */
-    public Observable<userBean> userLogin(RequestBody requestBody){
+    public Observable<userObj> userLogin(RequestBody requestBody){
         return observe(mUserAbout.userLogin(requestBody))
-                .map(new Func1<userBean, userBean>() {
+                .map(new Func1<userObj, userObj>() {
                     @Override
-                    public userBean call(userBean userBean) {
-                        if(userBean.getId() == null){
+                    public userObj call(userObj userObj) {
+                        if(userObj.getId() == null){
                             return null;
                         }
                         return null;

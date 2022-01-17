@@ -1,4 +1,4 @@
-package bean;
+package tools;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;

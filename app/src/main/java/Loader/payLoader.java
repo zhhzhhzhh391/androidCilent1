@@ -1,6 +1,6 @@
 package Loader;
 
-import bean.BaseResponse;
+import commonObj.BaseResponse;
 import rx.functions.Func1;
 
 

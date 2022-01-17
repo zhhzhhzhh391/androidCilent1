@@ -1,7 +1,7 @@
 package serviceInterface;
 
-import bean.userBean;
-import bean.userInfoBean;
+import commonObj.userInfoObj;
+import commonObj.userObj;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -16,11 +16,11 @@ public interface UserAbout {
 
     //获取所有用户信息
     @GET("UserAbout")
-    Observable<userInfoBean> getAllUser();
+    Observable<userInfoObj> getAllUser();
 
     @POST("UserAbout/userlogin/")
-    Observable<userBean> userLogin(@Body RequestBody requestBody);
+    Observable<userObj> userLogin(@Body RequestBody requestBody);
 
     @POST("UserAbout/loginOut/")
-    Observable<userBean> userLoginOut(@Body RequestBody requestBody);
+    Observable<userObj> userLoginOut(@Body RequestBody requestBody);
 }

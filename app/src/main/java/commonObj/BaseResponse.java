@@ -1,4 +1,4 @@
-package bean;
+package commonObj;
 
 /***
  * 网络请求记录

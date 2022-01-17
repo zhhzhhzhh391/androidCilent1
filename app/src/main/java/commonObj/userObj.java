@@ -1,14 +1,8 @@
-package bean;
+package commonObj;
 
 import java.util.Date;
 
-public class userBean {
-    private Integer id;
-    private String username;
-    private String password;
-    private Date add_time;
-    private String email;
-
+public class userObj {
     public Integer getId() {
         return id;
     }
@@ -49,13 +43,10 @@ public class userBean {
         this.email = email;
     }
 
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    private Integer level;
+    private Integer id;
+    private String username;
+    private String password;
+    private Date add_time;
+    private String email;
+    public userObj(){}
 }

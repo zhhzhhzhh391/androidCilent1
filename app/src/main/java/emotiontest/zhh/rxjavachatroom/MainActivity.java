@@ -2,10 +2,8 @@ package emotiontest.zhh.rxjavachatroom;
 
 import Loader.userLoader;
 import androidx.appcompat.app.AppCompatActivity;
-import bean.getRequestBody;
-import bean.userBean;
-import bean.userInfoBean;
-import okhttp3.MediaType;
+import tools.getRequestBody;
+import commonObj.userObj;
 import okhttp3.RequestBody;
 import rx.functions.Action1;
 
@@ -31,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Button getUserListBtn;
     private TextView showMsgText;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getUserList(){
-        mUserLoader.getAllUser().subscribe(new Action1<ArrayList<userBean>>() {
+        mUserLoader.getAllUser().subscribe(new Action1<ArrayList<userObj>>() {
             @Override
-            public void call(ArrayList<userBean> userBeans) {
-                showMsgText.setText(userBeans.get(0).getUsername());
+            public void call(ArrayList<userObj> userObjs) {
+                showMsgText.setText(userObjs.get(0).getUsername());
             }
         }, new Action1<Throwable>() {
             @Override
@@ -75,15 +75,15 @@ public class MainActivity extends AppCompatActivity {
     private void userLogin(){
         String loginUsername = usernameEdit.getText().toString();
         String loginPassword = passwordEdit.getText().toString();
-        userBean mUser= new userBean();
+        userObj mUser= new userObj();
         mUser.setUsername(loginUsername);
         mUser.setPassword(loginPassword);
         String userJson = new Gson().toJson(mUser);
         RequestBody requestBody = new getRequestBody(userJson).requestBodyBuilder();
-        mUserLoader.userLogin(requestBody).subscribe(new Action1<userBean>() {
+        mUserLoader.userLogin(requestBody).subscribe(new Action1<userObj>() {
             @Override
-            public void call(userBean userBean) {
-                if(userBean == null){
+            public void call(userObj userObj) {
+                if(userObj == null){
 
                 }
             }
