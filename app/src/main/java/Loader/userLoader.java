@@ -33,7 +33,7 @@ public class userLoader extends ObjectLoader {
                         return userInfoObj.getResults();
                     }
                 });
-//                .map(new payLoader<BaseResponse<userInfoBean>>());
+//
     }
 
     /**
@@ -47,7 +47,7 @@ public class userLoader extends ObjectLoader {
                         if(userObj.getId() == null){
                             return null;
                         }
-                        return null;
+                        return userObj;
                     }
                 });
     }

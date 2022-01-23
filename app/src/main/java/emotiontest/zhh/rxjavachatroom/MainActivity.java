@@ -83,9 +83,7 @@ public class MainActivity extends AppCompatActivity {
         mUserLoader.userLogin(requestBody).subscribe(new Action1<userObj>() {
             @Override
             public void call(userObj userObj) {
-                if(userObj == null){
-
-                }
+                Log.i("userLogin 的 userObj对象",userObj.getUsername());
             }
         }, new Action1<Throwable>() {
             @Override
