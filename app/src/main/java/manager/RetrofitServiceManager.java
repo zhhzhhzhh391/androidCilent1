@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import config.ApiConfig;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitServiceManager {
@@ -22,7 +22,7 @@ public class RetrofitServiceManager {
 
         mRetrofit = new Retrofit.Builder()
                 .client(builder.build())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(ApiConfig.BASE_URL)
                 .build();

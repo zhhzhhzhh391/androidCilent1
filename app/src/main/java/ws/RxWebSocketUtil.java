@@ -6,6 +6,7 @@ import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.reactivestreams.Subscriber;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +14,11 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
-import rx.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,15 +26,10 @@ import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
-import rx.Observable;
-import rx.Scheduler;
-import rx.Subscriber;
-import rx.android.MainThreadSubscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
 
 public class RxWebSocketUtil {
 
@@ -112,19 +112,19 @@ public class RxWebSocketUtil {
             observable = Observable.create(new WebSocketOnSubscribe(url))
                     .timeout(timeout,timeUnit)
                     .retry()//设置重连
-                    .doOnUnsubscribe(new Action0() {
+                    .doOnDispose(new Action() {
                         @Override
-                        public void call() {
+                        public void run() throws Exception {
                             observableMap.remove(url);
                             webSocketMap.remove(url);
                             if(showLog){
                                 Log.d(logTag,"关闭监听");
                             }
                         }
-                    })
-                    .doOnNext(new Action1<WebSocketInfo>() {
+                        })
+                    .doOnNext(new Consumer<WebSocketInfo>() {
                         @Override
-                        public void call(WebSocketInfo webSocketInfo) {
+                        public void accept(WebSocketInfo webSocketInfo) throws Exception {
                             if(webSocketInfo.isOnOpen()){
                                 webSocketMap.put(url,webSocketInfo.getWebSocket());
                             }
@@ -151,15 +151,16 @@ public class RxWebSocketUtil {
 
     public Observable<String> getWebSocketString(String url) {
         return getWebSocketInfo(url)
-                .map(new Func1<WebSocketInfo, String>() {
+                .map(new Function<WebSocketInfo, String>() {
                     @Override
-                    public String call(WebSocketInfo webSocketInfo) {
+                    public String apply(WebSocketInfo webSocketInfo) throws Exception {
                         return webSocketInfo.getString();
                     }
                 })
-                .filter(new Func1<String, Boolean>() {
+                .filter(new Predicate<String>() {
+
                     @Override
-                    public Boolean call(String s) {
+                    public boolean test(String s) throws Exception {
                         return s != null;
                     }
                 });
@@ -167,15 +168,15 @@ public class RxWebSocketUtil {
 
     public Observable<ByteString> getWebSocketByteString(String url) {
         return getWebSocketInfo(url)
-                .map(new Func1<WebSocketInfo, ByteString>() {
+                .map(new Function<WebSocketInfo, ByteString>() {
                     @Override
-                    public ByteString call(WebSocketInfo webSocketInfo) {
+                    public ByteString apply(WebSocketInfo webSocketInfo) throws Exception {
                         return webSocketInfo.getByteString();
                     }
                 })
-                .filter(new Func1<ByteString, Boolean>() {
+                .filter(new Predicate<ByteString>() {
                     @Override
-                    public Boolean call(ByteString byteString) {
+                    public boolean test(ByteString byteString) throws Exception {
                         return byteString != null;
                     }
                 });
@@ -183,9 +184,9 @@ public class RxWebSocketUtil {
 
     public Observable<WebSocket> getWebSocket(String url) {
         return getWebSocketInfo(url)
-                .map(new Func1<WebSocketInfo, WebSocket>() {
+                .map(new Function<WebSocketInfo, WebSocket>() {
                     @Override
-                    public WebSocket call(WebSocketInfo webSocketInfo) {
+                    public WebSocket apply(WebSocketInfo webSocketInfo) throws Exception {
                         return webSocketInfo.getWebSocket();
                     }
                 });
@@ -229,10 +230,10 @@ public class RxWebSocketUtil {
      */
     public void asyncSend(String url, final String msg) {
         getWebSocket(url)
-                .first()
-                .subscribe(new Action1<WebSocket>() {
+                .firstElement()
+                .subscribe(new Consumer<WebSocket>() {
                     @Override
-                    public void call(WebSocket webSocket) {
+                    public void accept(WebSocket webSocket) throws Exception {
                         webSocket.send(msg);
                     }
                 });
@@ -247,10 +248,10 @@ public class RxWebSocketUtil {
      */
     public void asyncSend(String url, final ByteString byteString) {
         getWebSocket(url)
-                .first()
-                .subscribe(new Action1<WebSocket>() {
+                .firstElement()
+                .subscribe(new Consumer<WebSocket>() {
                     @Override
-                    public void call(WebSocket webSocket) {
+                    public void accept(WebSocket webSocket) throws Exception {
                         webSocket.send(byteString);
                     }
                 });
@@ -261,7 +262,7 @@ public class RxWebSocketUtil {
         return new Request.Builder().get().url(url).build();
     }
 
-    private final class WebSocketOnSubscribe implements Observable.OnSubscribe<WebSocketInfo>{
+    private final class WebSocketOnSubscribe implements ObservableOnSubscribe<WebSocketInfo> {
 
         private String url;
 
@@ -270,21 +271,23 @@ public class RxWebSocketUtil {
         public WebSocketOnSubscribe(String url) {
             this.url = url;
         }
+
         @Override
-        public void call(Subscriber<? super WebSocketInfo> subscriber) {
-            if(webSocket!=null) {
-                if (!"main".equals(Thread.currentThread().getName())) {
+        public void subscribe(ObservableEmitter<WebSocketInfo> e) throws Exception {
+            if(webSocket!=null){
+                if(!"main".equals(Thread.currentThread().getName())){
                     long ms = reconnectIntervalTimeUnit.toMillis(interval);
-                    if (ms == 0) {
+                    if(ms == 0){
                         ms = 1000;
                     }
                     SystemClock.sleep(ms);
-                    subscriber.onNext(WebSocketInfo.createReconnect());
+                    e.onNext(WebSocketInfo.createReconnect());
                 }
             }
-            initWebSocket(subscriber);
+            initWebSocket(e);
         }
-        private void initWebSocket(final Subscriber<? super WebSocketInfo> subscriber){
+
+        private void initWebSocket(final ObservableEmitter<? super WebSocketInfo> e){
             webSocket = client.newWebSocket(getRequest(url), new WebSocketListener() {
                 @Override
                 public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
@@ -303,22 +306,22 @@ public class RxWebSocketUtil {
                     if (showLog) {
                         Log.e(logTag, t.toString() + webSocket.request().url().uri().getPath());
                     }
-                    if (!subscriber.isUnsubscribed()) {
-                        subscriber.onError(t);
+                    if (!e.isDisposed()) {
+                        e.onError(t);
                     }
                 }
 
                 @Override
                 public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-                    if (!subscriber.isUnsubscribed()) {
-                        subscriber.onNext(new WebSocketInfo(webSocket, text));
+                    if (!e.isDisposed()) {
+                        e.onNext(new WebSocketInfo(webSocket, text));
                     }
                 }
 
                 @Override
                 public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
-                    if (!subscriber.isUnsubscribed()) {
-                        subscriber.onNext(new WebSocketInfo(webSocket, bytes));
+                    if (!e.isDisposed()) {
+                        e.onNext(new WebSocketInfo(webSocket, bytes));
                     }
                 }
 
@@ -328,20 +331,12 @@ public class RxWebSocketUtil {
                         Log.d(logTag,url+"-->OnOpent");
                     }
                     webSocketMap.put(url,webSocket);
-                    if (!subscriber.isUnsubscribed()) {
-                        subscriber.onNext(new WebSocketInfo(webSocket, true));
-                    }
-                }
-            });
-            subscriber.add(new MainThreadSubscription() {
-                @Override
-                protected void onUnsubscribe() {
-                    webSocket.close(3000,"关闭WebSocket");
-                    if (showLog) {
-                        Log.d(logTag,url+"------>关闭绑定");
+                    if (!e.isDisposed()) {
+                        e.onNext(new WebSocketInfo(webSocket, true));
                     }
                 }
             });
         }
+
     }
 }

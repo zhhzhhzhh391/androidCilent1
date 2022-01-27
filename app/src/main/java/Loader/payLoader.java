@@ -1,13 +1,13 @@
 package Loader;
 
 import commonObj.BaseResponse;
-import rx.functions.Func1;
+import io.reactivex.functions.Function;
 
 
-public class payLoader<T> implements Func1<BaseResponse<T>, T>{
+public class payLoader<T> implements Function<BaseResponse<T>, T>{
 
     @Override
-    public T call(BaseResponse<T> tBaseResponse) {
+    public T apply(BaseResponse<T> tBaseResponse) throws Exception {
         return tBaseResponse.data;
     }
 }

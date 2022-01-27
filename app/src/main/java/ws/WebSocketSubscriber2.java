@@ -8,11 +8,15 @@ import java.lang.reflect.Type;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+
 
 /**
  * Created by dhh on 2018/4/9.
@@ -44,9 +48,9 @@ public abstract class WebSocketSubscriber2<T> extends WebSocketSubscriber {
     @CallSuper
     protected void onMessage(@NonNull String text) {
         Observable.just(text)
-                .map(new Func1<String, T>() {
+                .map(new Function<String, Object>() {
                     @Override
-                    public T call(String s) {
+                    public Object apply(String s) throws Exception {
                         try {
                             return GSON.fromJson(s, type);
                         } catch (JsonSyntaxException e) {
@@ -55,13 +59,13 @@ public abstract class WebSocketSubscriber2<T> extends WebSocketSubscriber {
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<T>() {
-                    @Override
-                    public void call(T t) {
-                        onMessage(t);
-                    }
-                });
+                .observeOn(AndroidSchedulers.mainThread());
+//                .subscribe(new Consumer<T>() {
+//                    @Override
+//                    public void accept(T t) throws Exception {
+//                        onMessage(t);
+//                    }
+//                });
     }
 
     protected abstract void onMessage(T t);

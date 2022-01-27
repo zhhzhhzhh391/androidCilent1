@@ -5,8 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import tools.getRequestBody;
 import commonObj.userObj;
 import okhttp3.RequestBody;
-import rx.functions.Action1;
-
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Action;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -59,15 +59,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getUserList(){
-        mUserLoader.getAllUser().subscribe(new Action1<ArrayList<userObj>>() {
+        mUserLoader.getAllUser().subscribe(new Consumer<ArrayList<userObj>>() {
             @Override
-            public void call(ArrayList<userObj> userObjs) {
+            public void accept(ArrayList<userObj> userObjs) throws Exception {
                 showMsgText.setText(userObjs.get(0).getUsername());
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                Log.e("TAG","errorMsg" + throwable.getMessage());
             }
         });
     }
@@ -80,15 +75,18 @@ public class MainActivity extends AppCompatActivity {
         mUser.setPassword(loginPassword);
         String userJson = new Gson().toJson(mUser);
         RequestBody requestBody = new getRequestBody(userJson).requestBodyBuilder();
-        mUserLoader.userLogin(requestBody).subscribe(new Action1<userObj>() {
+        mUserLoader.userLogin(requestBody).subscribe(new Consumer<userObj>() {
             @Override
-            public void call(userObj userObj) {
-                Log.i("userLogin 的 userObj对象",userObj.getUsername());
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                Log.e("TAG","errorMsg" + throwable.getMessage());
+            public void accept(userObj userObj) throws Exception {
+                try{
+                    if(userObj!=null){
+                        Log.i("userLogin",userObj.getUsername());
+                    }else{
+                        Log.i("userLogin","账号密码错误，服务端没有返回user对象");
+                    }
+                }catch (Exception e){
+                    Log.e("error:",e.getMessage());
+                }
             }
         });
     }

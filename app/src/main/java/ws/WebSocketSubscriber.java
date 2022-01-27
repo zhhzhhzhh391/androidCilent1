@@ -1,11 +1,12 @@
 package ws;
 
+import org.reactivestreams.Subscriber;
+
 import androidx.annotation.NonNull;
 import okio.ByteString;
-import rx.Subscriber;
 import okhttp3.WebSocket;
 
-public abstract class WebSocketSubscriber extends Subscriber<WebSocketInfo> {
+public abstract class WebSocketSubscriber implements Subscriber<WebSocketInfo> {
     private boolean hasOpened;
 
     @Override
@@ -46,7 +47,7 @@ public abstract class WebSocketSubscriber extends Subscriber<WebSocketInfo> {
     }
 
     @Override
-    public final void onCompleted() {
+    public final void onComplete() {
         if (hasOpened) {
             onClose();
         }

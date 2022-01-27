@@ -4,10 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import commonObj.chatMsgObj;
 import commonObj.userObj;
 import config.ApiConfig;
-import okhttp3.OkHttpClient;
-import rx.Observer;
-import rx.Scheduler;
-import rx.Subscriber;
 import ws.djangoWS;
 
 import android.os.Bundle;
@@ -22,7 +18,7 @@ import com.google.gson.Gson;
 
 import java.net.URI;
 import java.util.ArrayList;
-import rx.Observable;
+
 
 
 public class ChatRoomActivity extends AppCompatActivity {
@@ -71,8 +67,8 @@ public class ChatRoomActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         userObj connectUser = new userObj();
-        connectUser.setId(2);
-        connectUser.setUsername("zhh");
+        connectUser.setId(3);
+        connectUser.setUsername("zhh111");
         String strConnectUser = new Gson().toJson(connectUser);
         listener.send(strConnectUser);
     }

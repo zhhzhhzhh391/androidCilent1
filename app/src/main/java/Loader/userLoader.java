@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import commonObj.userInfoObj;
 import commonObj.userObj;
 import okhttp3.RequestBody;
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+
 import serviceInterface.UserAbout;
 import manager.RetrofitServiceManager;
 
@@ -24,12 +25,9 @@ public class userLoader extends ObjectLoader {
      */
     public Observable<ArrayList<userObj>> getAllUser(){
         return observe(mUserAbout.getAllUser())
-                .map(new Func1<userInfoObj, ArrayList<userObj>>() {
+                .map(new Function<userInfoObj, ArrayList<userObj>>() {
                     @Override
-                    public ArrayList<userObj> call(userInfoObj userInfoObj) {
-                        if(userInfoObj.getCount() == 0){
-                            return null;
-                        }
+                    public ArrayList<userObj> apply(userInfoObj userInfoObj) throws Exception {
                         return userInfoObj.getResults();
                     }
                 });
@@ -41,12 +39,9 @@ public class userLoader extends ObjectLoader {
      */
     public Observable<userObj> userLogin(RequestBody requestBody){
         return observe(mUserAbout.userLogin(requestBody))
-                .map(new Func1<userObj, userObj>() {
+                .map(new Function<userObj, userObj>() {
                     @Override
-                    public userObj call(userObj userObj) {
-                        if(userObj.getId() == null){
-                            return null;
-                        }
+                    public userObj apply(userObj userObj) throws Exception {
                         return userObj;
                     }
                 });
