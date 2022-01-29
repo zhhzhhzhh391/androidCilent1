@@ -2,12 +2,22 @@ package ws;
 
 import org.reactivestreams.Subscriber;
 
+import java.util.concurrent.TimeoutException;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import androidx.annotation.NonNull;
 import okio.ByteString;
 import okhttp3.WebSocket;
 
-public abstract class WebSocketSubscriber implements Subscriber<WebSocketInfo> {
+public abstract class WebSocketSubscriber implements Observer<WebSocketInfo> {
     private boolean hasOpened;
+
+    @Override
+    public void onSubscribe(Disposable d) {
+
+    }
 
     @Override
     public final void onNext(@NonNull WebSocketInfo webSocketInfo) {
@@ -20,6 +30,18 @@ public abstract class WebSocketSubscriber implements Subscriber<WebSocketInfo> {
             onMessage(webSocketInfo.getByteString());
         } else if (webSocketInfo.isOnReconnect()) {
             onReconnect();
+        }
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onComplete() {
+        if (hasOpened) {
+            onClose();
         }
     }
 
@@ -46,15 +68,4 @@ public abstract class WebSocketSubscriber implements Subscriber<WebSocketInfo> {
     protected void onClose() {
     }
 
-    @Override
-    public final void onComplete() {
-        if (hasOpened) {
-            onClose();
-        }
-    }
-
-    @Override
-    public void onError(Throwable e) {
-        e.printStackTrace();
-    }
 }

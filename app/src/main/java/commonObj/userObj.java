@@ -43,10 +43,20 @@ public class userObj {
         this.email = email;
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
     private Integer id;
     private String username;
     private String password;
     private Date add_time;
     private String email;
+    private int code;
     public userObj(){}
+
 }

@@ -1,12 +1,22 @@
 package emotiontest.zhh.rxjavachatroom;
 
+import androidx.annotation.NonNull;
 import Loader.userLoader;
 import androidx.appcompat.app.AppCompatActivity;
+import config.ApiConfig;
+import constant.chatAboutConstants;
+import okhttp3.WebSocket;
+import okio.ByteString;
 import tools.getRequestBody;
 import commonObj.userObj;
 import okhttp3.RequestBody;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Action;
+import ws.Config;
+import ws.RxWebSocket;
+import ws.WebSocketInfo;
+import ws.WebSocketSubscriber;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,10 +25,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.trello.rxlifecycle2.RxLifecycle;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
+
+import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends RxAppCompatActivity {
     public static final String baseUrl = "http://192.168.137.1:6263/wechat/api/";
 
     private userLoader mUserLoader;
@@ -55,7 +70,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-         mUserLoader = new userLoader();
+        mUserLoader = new userLoader();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void getUserList(){
@@ -81,13 +101,49 @@ public class MainActivity extends AppCompatActivity {
                 try{
                     if(userObj!=null){
                         Log.i("userLogin",userObj.getUsername());
+                        Log.i("userLogin","当前账号登录成功，准备连接ws");
+                        userObj.setCode(chatAboutConstants.userObj.USER_LOGIN_SUCCESS);
+                        setChatWsConnect(userObj);
                     }else{
                         Log.i("userLogin","账号密码错误，服务端没有返回user对象");
                     }
                 }catch (Exception e){
-                    Log.e("error:",e.getMessage());
+                    Log.e("账号登录error:",e.getMessage());
                 }
             }
         });
+    }
+
+    /*
+    * 与聊天服务建立连接
+    * */
+    private void setChatWsConnect(userObj mUser){
+        Gson mgson = new Gson();
+        final String loginUserInfo = mgson.toJson(mUser,userObj.class);
+        Config config = new Config.Builder()
+                .setShowLog(true)           //show  log
+                .build();
+        RxWebSocket.setConfig(config);
+        RxWebSocket.get(ApiConfig.channelURL)
+                .compose(this.<WebSocketInfo>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new WebSocketSubscriber() {
+                    @Override
+                    public void onOpen(@NonNull WebSocket webSocket) {
+                        RxWebSocket.send(ApiConfig.channelURL,loginUserInfo);
+                        Log.d(Thread.currentThread().getName(), "onOpen1:");
+                    }
+                    @Override
+                    public void onMessage(@NonNull String text) {
+                        Log.d(Thread.currentThread().getName(), "返回数据:" + text);
+                    }
+                    @Override
+                    public void onMessage(@NonNull ByteString byteString) {
+
+                    }
+                    @Override
+                    protected void onReconnect() {
+                        Log.d("MainActivity", "重连:");
+                    }
+                });
     }
 }

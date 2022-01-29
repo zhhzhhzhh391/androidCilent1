@@ -19,6 +19,8 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
+import io.reactivex.Observable;
+
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -49,21 +51,21 @@ public class RxWebSocketUtil {
             throw new RuntimeException("请先要安装okhttp3库");
         }
         try {
-            Class.forName("rx.Observable");
+            Class.forName("io.reactivex.Observable");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("请先安装rxjava 1.x及以上版本");
+            throw new RuntimeException("请先安装rxjava 2.x及以上版本");
         }
         try {
-            Class.forName("rx.android.schedulers.AndroidSchedulers");
+            Class.forName("io.reactivex.android.schedulers.AndroidSchedulers");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("请先安装rxandroid 1.x及以上版本");
+            throw new RuntimeException("请先安装rxandroid 2.x及以上版本");
         }
         observableMap = new ArrayMap<>();
         webSocketMap = new ArrayMap<>();
         client = new OkHttpClient();
     }
 
-    public static RxWebSocketUtil getUserInstance(){
+    public static RxWebSocketUtil getInstance(){
         if(instance == null){
             synchronized (RxWebSocketUtil.class){
                 if(instance == null){

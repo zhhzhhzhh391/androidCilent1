@@ -7,16 +7,19 @@
     tools:context=".ChatRoomActivity"
     android:orientation="vertical">
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="在输入框内输入要发送的消息"
+        android:id="@+id/msgText"
+        ></EditText>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="进入房间"
-        android:id="@+id/enterRoom"
+        android:text="发送消息"
+        android:id="@+id/sendMsg"
         ></Button>
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/roomUserList"></ListView>
+
 
 </LinearLayout>

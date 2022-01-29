@@ -1,9 +1,14 @@
 package emotiontest.zhh.rxjavachatroom;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import commonObj.chatMsgObj;
 import commonObj.userObj;
 import config.ApiConfig;
+import ws.RxWebSocket;
+import ws.RxWebSocketUtil;
+import ws.WebSocketInfo;
+import ws.WebSocketSubscriber;
 import ws.djangoWS;
 
 import android.os.Bundle;
@@ -12,99 +17,56 @@ import android.view.View;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 import java.net.URI;
 import java.util.ArrayList;
 
 
 
-public class ChatRoomActivity extends AppCompatActivity {
-    private Button enterRoomBtn;
-    private ListView roomUserListView;
-    private ArrayAdapter<userObj> adapter;
-
-    private djangoWS listener;
-    private ArrayList<userObj> userList;
-
+public class ChatRoomActivity extends RxAppCompatActivity {
+    private Button sendMsgBtn;
+    private EditText msgTextEt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
-        setConnectServer();
-
-        userList = new ArrayList<>();/*初始化房间内用户*/
-
-        enterRoomBtn = (Button)findViewById(R.id.enterRoom);
-        enterRoomBtn.setOnClickListener(new View.OnClickListener() {
+        initView();
+        sendMsgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getConnect();
+                sendMsg();
             }
         });
 
-        roomUserListView = (ListView)findViewById(R.id.roomUserList);
-        adapter = new ArrayAdapter<userObj>(ChatRoomActivity.this,R.layout.support_simple_spinner_dropdown_item,userList);
+    }
+
+    private void sendMsg(){
+        String msg = msgTextEt.getText().toString();
+        Log.i("客户端发送的msg消息",msg);
+        RxWebSocket.get(ApiConfig.channelURL)
+                .compose(this.<WebSocketInfo>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new WebSocketSubscriber() {
+                    @Override
+                    protected void onMessage(@NonNull String text) {
+                        super.onMessage(text);
+                    }
+
+                    @Override
+                    protected void onClose() {
+                        super.onClose();
+                    }
+                });
 
     }
 
-    private void setConnectServer() {
-        URI uri = URI.create(ApiConfig.channelURL);
-        listener = new djangoWS(uri){
-            @Override
-            public void onMessage(String message){
-                msgDealer(message);
-            }
-        };
-    }
-
-    private void getConnect(){
-        try{
-            listener.connectBlocking();//djangoWS.connectBlocking会多出一个等待操作，先连接再发送
-        }catch (InterruptedException e ){
-            e.printStackTrace();
-        }
-        userObj connectUser = new userObj();
-        connectUser.setId(3);
-        connectUser.setUsername("zhh111");
-        String strConnectUser = new Gson().toJson(connectUser);
-        listener.send(strConnectUser);
-    }
-
-    //UI线程内关闭了连接，需要将对象置空，避免重复初始化对象
-    private void closeConnect(){
-        try{
-            if(listener != null){
-                listener.close();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            listener = null;
-        }
-    }
-
-    /*
-    处理django ws的消息
-     */
-    public void msgDealer(String message){
-        Log.e("msgDealer",message);
-        Gson gson = new Gson();
-        chatMsgObj mChatMsgObj = new chatMsgObj();
-        mChatMsgObj = gson.fromJson(message,chatMsgObj.class);
-        if(mChatMsgObj.getCode() == 200){
-            /*有新的账号进入房间，更新房间数据*/
-            userList = mChatMsgObj.getMsg();
-        }
-    }
-
-    /*进程杀死时，关闭ws连接*/
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        closeConnect();
-        getDelegate().onDestroy();
+    private void initView(){
+        sendMsgBtn = (Button)findViewById(R.id.sendMsg);
+        msgTextEt = (EditText) findViewById(R.id.msgText);
     }
 }

@@ -3,7 +3,7 @@ package commonObj;
 import java.util.ArrayList;
 
 public class chatMsgObj {
-    public chatMsgObj(){}
+    private int code;
 
     public int getCode() {
         return code;
@@ -13,14 +13,13 @@ public class chatMsgObj {
         this.code = code;
     }
 
-    public ArrayList<userObj> getMsg() {
+    public String getMsg() {
         return msg;
     }
 
-    public void setMsg(ArrayList<userObj> msg) {
+    public void setMsg(String msg) {
         this.msg = msg;
     }
 
-    private int code;
-    private ArrayList<userObj> msg;
+    private String msg;
 }
