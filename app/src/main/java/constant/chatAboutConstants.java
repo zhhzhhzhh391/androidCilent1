@@ -12,7 +12,7 @@ public interface chatAboutConstants {
 
     }
 
-    public static class msgObj{
-
+    public static class chatMsgObj{
+        public static final int CHATMSG_SUCCESS = 2000;
     }
 }
