@@ -3,6 +3,19 @@ package commonObj;
 import java.util.Date;
 
 public class userObj {
+
+    private userObj(){}
+    /*
+     * 静态内部类加载的user
+     * */
+    private static class userObjInstance{
+        private static final userObj INSTANCE  = new userObj();
+    }
+
+    public static userObj getInstance(){
+        return userObjInstance.INSTANCE;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -43,12 +56,12 @@ public class userObj {
         this.email = email;
     }
 
-    public int getCode() {
-        return code;
+    public String getToken() {
+        return token;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     private Integer id;
@@ -56,7 +69,6 @@ public class userObj {
     private String password;
     private Date add_time;
     private String email;
-    private int code;
-    public userObj(){}
+    private String token;
 
 }

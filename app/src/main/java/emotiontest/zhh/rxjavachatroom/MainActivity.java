@@ -3,6 +3,7 @@ package emotiontest.zhh.rxjavachatroom;
 import androidx.annotation.NonNull;
 import Loader.userLoader;
 import androidx.appcompat.app.AppCompatActivity;
+import commonObj.bsResponse;
 import config.ApiConfig;
 import constant.chatAboutConstants;
 import okhttp3.WebSocket;
@@ -17,6 +18,7 @@ import ws.RxWebSocket;
 import ws.WebSocketInfo;
 import ws.WebSocketSubscriber;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +27,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.trello.rxlifecycle2.RxLifecycle;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
@@ -45,7 +49,9 @@ public class MainActivity extends RxAppCompatActivity {
     private Button getUserListBtn;
     private TextView showMsgText;
 
+    private Intent toChatActivity;//跳转到chatacitivity
 
+    private  userObj mUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +76,8 @@ public class MainActivity extends RxAppCompatActivity {
             }
         });
 
+        toChatActivity = new Intent(this,ChatRoomActivity.class);
+
         mUserLoader = new userLoader();
     }
 
@@ -90,7 +98,8 @@ public class MainActivity extends RxAppCompatActivity {
     private void userLogin(){
         String loginUsername = usernameEdit.getText().toString();
         String loginPassword = passwordEdit.getText().toString();
-        userObj mUser= new userObj();
+        //初始化登录的user对象
+        mUser = userObj.getInstance();
         mUser.setUsername(loginUsername);
         mUser.setPassword(loginPassword);
         String userJson = new Gson().toJson(mUser);
@@ -102,7 +111,6 @@ public class MainActivity extends RxAppCompatActivity {
                     if(userObj!=null){
                         Log.i("userLogin",userObj.getUsername());
                         Log.i("userLogin","当前账号登录成功，准备连接ws");
-                        userObj.setCode(chatAboutConstants.userObj.USER_LOGIN_SUCCESS);
                         setChatWsConnect(userObj);
                     }else{
                         Log.i("userLogin","账号密码错误，服务端没有返回user对象");
@@ -130,20 +138,27 @@ public class MainActivity extends RxAppCompatActivity {
                     @Override
                     public void onOpen(@NonNull WebSocket webSocket) {
                         RxWebSocket.send(ApiConfig.channelURL,loginUserInfo);
-                        Log.d(Thread.currentThread().getName(), "onOpen1:");
                     }
                     @Override
                     public void onMessage(@NonNull String text) {
-                        Log.d(Thread.currentThread().getName(), "返回数据:" + text);
-                    }
-                    @Override
-                    public void onMessage(@NonNull ByteString byteString) {
+                        msgDealer(text);
+    }
+    @Override
+    public void onMessage(@NonNull ByteString byteString) {
 
-                    }
-                    @Override
-                    protected void onReconnect() {
-                        Log.d("MainActivity", "重连:");
-                    }
-                });
+    }
+    @Override
+    protected void onReconnect() {
+        Log.d("MainActivity", "重连:");
+    }
+});
+//        startActivity(toChatActivity);
+//        onDestroy();
+        }
+private void msgDealer(String text){
+        Gson mgson = new Gson();
+
+        ArrayList<userObj> list = new ArrayList<>();
+
     }
 }
