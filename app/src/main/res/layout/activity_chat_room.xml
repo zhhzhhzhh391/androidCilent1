@@ -19,7 +19,15 @@
         android:text="发送消息"
         android:id="@+id/sendMsg"
         ></Button>
-
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="当前房间的用户:"
+        ></TextView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/msgShow"
+        ></TextView>
 
 </LinearLayout>

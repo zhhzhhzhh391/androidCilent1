@@ -2,6 +2,7 @@ package serviceInterface;
 
 import commonObj.userInfoObj;
 import commonObj.userObj;
+import commonObj.userTokenObj;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -19,6 +20,9 @@ public interface UserAbout {
 
     @POST("UserAbout/userlogin/")
     Observable<userObj> userLogin(@Body RequestBody requestBody);
+
+    @POST("UserAbout/getToken/")
+    Observable<userTokenObj> getToken(@Body RequestBody requestBody);
 
     @POST("UserAbout/loginOut/")
     Observable<userObj> userLoginOut(@Body RequestBody requestBody);

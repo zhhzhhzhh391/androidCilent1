@@ -330,7 +330,7 @@ public class RxWebSocketUtil {
                 @Override
                 public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
                     if(showLog){
-                        Log.d(logTag,url+"-->OnOpent");
+                        Log.d(logTag,url+"-->OnOpen");
                     }
                     webSocketMap.put(url,webSocket);
                     if (!e.isDisposed()) {

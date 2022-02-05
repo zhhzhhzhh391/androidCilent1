@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import commonObj.chatMsgObj;
 import commonObj.userObj;
 import config.ApiConfig;
+import constant.chatAboutConstants;
 import ws.RxWebSocket;
 import ws.RxWebSocketUtil;
 import ws.WebSocketInfo;
@@ -19,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.trello.rxlifecycle2.android.ActivityEvent;
@@ -32,6 +34,8 @@ import java.util.ArrayList;
 public class ChatRoomActivity extends RxAppCompatActivity {
     private Button sendMsgBtn;
     private EditText msgTextEt;
+    private TextView msgShowTx;
+    private ArrayList<String> msgList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,17 +48,29 @@ public class ChatRoomActivity extends RxAppCompatActivity {
             }
         });
 
+        //初始化设置监听
+        setChatWsSubscribe();
     }
 
     private void sendMsg(){
-        String msg = msgTextEt.getText().toString();
-        Log.i("客户端发送的msg消息",msg);
+        userObj mUser = userObj.getInstance();
+        Gson mgson = new Gson();
+        chatMsgObj msgObj = new chatMsgObj();
+        String msgString = msgTextEt.getText().toString();
+        msgObj.setCode(chatAboutConstants.chatMsgObj.CHATMSG_SEND_SUCCESS);//表示用户成功进入房间，发送成功进入房间code
+        msgObj.setMsg(msgString);
+        msgObj.setUserId(mUser.getId());
+        String msgJson = mgson.toJson(msgObj);
+        RxWebSocket.send(ApiConfig.channelURL,msgJson);
+    }
+
+    private void setChatWsSubscribe(){
         RxWebSocket.get(ApiConfig.channelURL)
                 .compose(this.<WebSocketInfo>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new WebSocketSubscriber() {
                     @Override
                     protected void onMessage(@NonNull String text) {
-                        super.onMessage(text);
+                        msgDealer(text);
                     }
 
                     @Override
@@ -62,11 +78,21 @@ public class ChatRoomActivity extends RxAppCompatActivity {
                         super.onClose();
                     }
                 });
+    }
 
+    private void msgDealer(String text){
+        Gson mgson = new Gson();
+        chatMsgObj msgObj = new chatMsgObj();
+        msgObj = mgson.fromJson(text,chatMsgObj.class);
+        if(msgObj.getCode() == chatAboutConstants.chatMsgObj.CHATMSG_SEND_SUCCESS){
+            msgShowTx.setText(msgObj.getMsg());
+        }
     }
 
     private void initView(){
         sendMsgBtn = (Button)findViewById(R.id.sendMsg);
         msgTextEt = (EditText) findViewById(R.id.msgText);
+        msgShowTx = (TextView)findViewById(R.id.msgShow);
+        msgList = new ArrayList<>();
     }
 }

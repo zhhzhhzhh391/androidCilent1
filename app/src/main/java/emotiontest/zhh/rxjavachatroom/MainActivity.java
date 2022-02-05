@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import Loader.userLoader;
 import androidx.appcompat.app.AppCompatActivity;
 import commonObj.bsResponse;
+import commonObj.userTokenObj;
 import config.ApiConfig;
 import constant.chatAboutConstants;
 import okhttp3.WebSocket;
@@ -33,6 +34,8 @@ import com.trello.rxlifecycle2.RxLifecycle;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
@@ -45,6 +48,7 @@ public class MainActivity extends RxAppCompatActivity {
     private EditText usernameEdit;
     private EditText passwordEdit;
     private Button loginBtn;
+    private Button testSendBtn;
 
     private Button getUserListBtn;
     private TextView showMsgText;
@@ -56,9 +60,7 @@ public class MainActivity extends RxAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        showMsgText = (TextView)findViewById(R.id.showMessage) ;
-        getUserListBtn = (Button)findViewById(R.id.getUserList);
+        initView();
         getUserListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,13 +68,17 @@ public class MainActivity extends RxAppCompatActivity {
             }
         });
 
-        usernameEdit = (EditText)findViewById(R.id.getusernameEdit);
-        passwordEdit = (EditText)findViewById(R.id.getpasswordEdit);
-        loginBtn = (Button) findViewById(R.id.loginBtn);
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 userLogin();
+            }
+        });
+
+        testSendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendTestMsg();
             }
         });
 
@@ -87,7 +93,8 @@ public class MainActivity extends RxAppCompatActivity {
     }
 
     private void getUserList(){
-        mUserLoader.getAllUser().subscribe(new Consumer<ArrayList<userObj>>() {
+        mUserLoader.getAllUser().
+                subscribe(new Consumer<ArrayList<userObj>>() {
             @Override
             public void accept(ArrayList<userObj> userObjs) throws Exception {
                 showMsgText.setText(userObjs.get(0).getUsername());
@@ -103,14 +110,18 @@ public class MainActivity extends RxAppCompatActivity {
         mUser.setUsername(loginUsername);
         mUser.setPassword(loginPassword);
         String userJson = new Gson().toJson(mUser);
-        RequestBody requestBody = new getRequestBody(userJson).requestBodyBuilder();
-        mUserLoader.userLogin(requestBody).subscribe(new Consumer<userObj>() {
+        final RequestBody requestBody = new getRequestBody(userJson).requestBodyBuilder();
+        mUserLoader.userLogin(requestBody).compose(this.<userObj>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new Consumer<userObj>() {
             @Override
             public void accept(userObj userObj) throws Exception {
                 try{
                     if(userObj!=null){
                         Log.i("userLogin",userObj.getUsername());
                         Log.i("userLogin","当前账号登录成功，准备连接ws");
+                        mUser.setId(userObj.getId());
+                        setToken(requestBody);//为登录的user对象保存token
+                        userObj.setCode(chatAboutConstants.chatMsgObj.ENTERROOM_SUCCESS);
                         setChatWsConnect(userObj);
                     }else{
                         Log.i("userLogin","账号密码错误，服务端没有返回user对象");
@@ -142,23 +153,55 @@ public class MainActivity extends RxAppCompatActivity {
                     @Override
                     public void onMessage(@NonNull String text) {
                         msgDealer(text);
-    }
-    @Override
-    public void onMessage(@NonNull ByteString byteString) {
+                    }
+                    @Override
+                    public void onMessage(@NonNull ByteString byteString) {
 
-    }
-    @Override
-    protected void onReconnect() {
-        Log.d("MainActivity", "重连:");
-    }
-});
-//        startActivity(toChatActivity);
-//        onDestroy();
+                    }
+                    @Override
+                    protected void onReconnect() {
+                        Log.d("MainActivity", "重连:");
+                    }
+                });
         }
-private void msgDealer(String text){
+    private void msgDealer(String text){
+
+        //跳转逻辑后面再封装处理
+        if(text!=null){
+            startActivity(toChatActivity);
+            finish();
+        }
+    }
+
+    private void sendTestMsg(){
         Gson mgson = new Gson();
+        mUser.setCode(chatAboutConstants.userObj.USER_LOGIN_SUCCESS);
+        mUser.setId(1);
+        String testJson = mgson.toJson(mUser,userObj.class);
+        RxWebSocket.send(ApiConfig.channelURL,testJson);
+    }
 
-        ArrayList<userObj> list = new ArrayList<>();
+    /*
+    * 登录成功的账号设置token
+    * */
+    private void setToken(RequestBody requestBody){
+        mUserLoader.getToken(requestBody)
+                .compose(this.<userTokenObj>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new Consumer<userTokenObj>() {
+                    @Override
+                    public void accept(userTokenObj userTokenObj) throws Exception {
+                        mUser.setToken(userTokenObj.getToken());
+                    }
+                });
+    }
 
+    private void initView(){
+        showMsgText = (TextView)findViewById(R.id.showMessage);
+        getUserListBtn = (Button)findViewById(R.id.getUserList);
+        usernameEdit = (EditText)findViewById(R.id.getusernameEdit);
+        passwordEdit = (EditText)findViewById(R.id.getpasswordEdit);
+        loginBtn = (Button) findViewById(R.id.loginBtn);
+        testSendBtn = (Button)findViewById(R.id.testSend);
     }
 }
+

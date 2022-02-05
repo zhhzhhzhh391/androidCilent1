@@ -22,4 +22,14 @@ public class chatMsgObj {
     }
 
     private String msg;
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    private int userId;
 }

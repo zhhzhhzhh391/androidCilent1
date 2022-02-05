@@ -64,11 +64,20 @@ public class userObj {
         this.token = token;
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+
     private Integer id;
     private String username;
     private String password;
     private Date add_time;
     private String email;
     private String token;
-
+    private int code;
 }

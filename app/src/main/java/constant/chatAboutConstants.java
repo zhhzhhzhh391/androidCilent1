@@ -13,6 +13,9 @@ public interface chatAboutConstants {
     }
 
     public static class chatMsgObj{
-        public static final int CHATMSG_SUCCESS = 2000;
+        public static final int ENTERROOM_SUCCESS = 2000;
+        public static final int ENTERROOM_FAIL = 2001;
+        public static final int CHATMSG_SEND_SUCCESS =2003;
+        public static final int CHATMSG_SEND_FAILED = 2004;
     }
 }
