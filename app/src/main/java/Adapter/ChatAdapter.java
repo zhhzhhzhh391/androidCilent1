@@ -13,11 +13,16 @@ import java.util.ArrayList;
 
 import commonObj.chatMsgObj;
 import commonObj.userObj;
+import Loader.userLoader;
 import emotiontest.zhh.rxjavachatroom.R;
+import io.reactivex.functions.Consumer;
+import okhttp3.RequestBody;
+import tools.getRequestBody;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     ArrayList<chatMsgObj> chatModelList;
+    userLoader mUserLoader;
 
     public ChatAdapter(ArrayList<chatMsgObj> dataList){
         this.chatModelList = dataList;
@@ -40,14 +45,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             holder.leftLayout.setVisibility(View.VISIBLE);
             holder.leftNameTextView.setVisibility(View.VISIBLE);
             holder.leftContentTextView.setVisibility(View.VISIBLE);
-            holder.leftNameTextView.setText(Integer.toString(chatModel.getUserId()));
+            holder.leftNameTextView.setText(chatModel.getNickname());
             holder.leftContentTextView.setText(chatModel.getMsg());
         }else {
             holder.leftLayout.setVisibility(View.GONE);
             holder.rightLayout.setVisibility(View.VISIBLE);
             holder.rightNameTextView.setVisibility(View.VISIBLE);
             holder.rightContentTextView.setVisibility(View.VISIBLE);
-            holder.rightNameTextView.setText(Integer.toString(chatModel.getUserId()));
+            holder.rightNameTextView.setText(chatModel.getNickname());
             holder.rightContentTextView.setText(chatModel.getMsg());
         }
     }

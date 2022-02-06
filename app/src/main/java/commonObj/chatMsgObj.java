@@ -3,8 +3,6 @@ package commonObj;
 import java.util.ArrayList;
 
 public class chatMsgObj {
-    private int code;
-
     public int getCode() {
         return code;
     }
@@ -21,8 +19,6 @@ public class chatMsgObj {
         this.msg = msg;
     }
 
-    private String msg;
-
     public int getUserId() {
         return userId;
     }
@@ -31,5 +27,16 @@ public class chatMsgObj {
         this.userId = userId;
     }
 
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    private String msg;
+    private int code;
     private int userId;
+    private String nickname;
 }

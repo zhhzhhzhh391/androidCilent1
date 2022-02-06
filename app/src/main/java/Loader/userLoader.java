@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import commonObj.userInfoObj;
 import commonObj.userObj;
 import commonObj.userTokenObj;
+import kotlin.jvm.Throws;
 import okhttp3.RequestBody;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
@@ -38,6 +39,7 @@ public class userLoader extends ObjectLoader {
     }
 
     /**
+     * requestbody : username,password or userId
      *获取指定的用户数据 用于用户登录
      */
     public Observable<userObj> userLogin(RequestBody requestBody){
@@ -68,7 +70,21 @@ public class userLoader extends ObjectLoader {
     }
 
     /**
-     * 注册新的用户
+     * params:userId
+     * return:userObj
      */
-
+    public Observable<userObj> getUserInfo(final RequestBody requestBody){
+        return observe(mUserAbout.getUserInfo(requestBody))
+                .map(new Function<userObj, userObj>() {
+                    @Override
+                    public userObj apply(userObj userObj) throws Exception {
+                        if(userObj==null){
+                            Log.e("通过id获取账号数据，获取错误",requestBody.toString());
+                            return null;
+                        }else{
+                            return userObj;
+                        }
+                    }
+                });
+    }
 }

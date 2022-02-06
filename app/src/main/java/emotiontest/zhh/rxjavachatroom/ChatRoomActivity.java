@@ -32,7 +32,7 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 import java.net.URI;
 import java.util.ArrayList;
-
+import Loader.userLoader;
 
 
 public class ChatRoomActivity extends RxAppCompatActivity {
@@ -44,6 +44,8 @@ public class ChatRoomActivity extends RxAppCompatActivity {
     RecyclerView recyclerView;
     ChatAdapter chatAdapter;
     ArrayList<chatMsgObj> msgList;
+
+    userLoader mUserLoader;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

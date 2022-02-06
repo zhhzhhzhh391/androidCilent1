@@ -15,7 +15,8 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             app:cardCornerRadius="6dp"
-            app:cardElevation="4dp">
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/black">
             <ImageView
                 android:id="@+id/left_image"
                 android:layout_width="match_parent"

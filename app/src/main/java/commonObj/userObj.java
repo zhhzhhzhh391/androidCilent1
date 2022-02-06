@@ -72,7 +72,15 @@ public class userObj {
         this.code = code;
     }
 
+    public String getNickname() {
+        return nickname;
+    }
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    private String nickname;
     private Integer id;
     private String username;
     private String password;
