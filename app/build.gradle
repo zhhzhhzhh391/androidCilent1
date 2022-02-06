@@ -41,4 +41,5 @@ dependencies {
     //网络请求依赖
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
 }

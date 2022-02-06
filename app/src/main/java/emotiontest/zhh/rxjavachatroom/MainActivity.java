@@ -2,8 +2,6 @@ package emotiontest.zhh.rxjavachatroom;
 
 import androidx.annotation.NonNull;
 import Loader.userLoader;
-import androidx.appcompat.app.AppCompatActivity;
-import commonObj.bsResponse;
 import commonObj.userTokenObj;
 import config.ApiConfig;
 import constant.chatAboutConstants;
@@ -13,7 +11,6 @@ import tools.getRequestBody;
 import commonObj.userObj;
 import okhttp3.RequestBody;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Action;
 import ws.Config;
 import ws.RxWebSocket;
 import ws.WebSocketInfo;
@@ -28,15 +25,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.trello.rxlifecycle2.RxLifecycle;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 

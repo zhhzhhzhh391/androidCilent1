@@ -2,6 +2,10 @@ package emotiontest.zhh.rxjavachatroom;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import Adapter.ChatAdapter;
 import commonObj.chatMsgObj;
 import commonObj.userObj;
 import config.ApiConfig;
@@ -35,12 +39,18 @@ public class ChatRoomActivity extends RxAppCompatActivity {
     private Button sendMsgBtn;
     private EditText msgTextEt;
     private TextView msgShowTx;
-    private ArrayList<String> msgList;
+    private LinearLayoutManager layoutManager;
+
+    RecyclerView recyclerView;
+    ChatAdapter chatAdapter;
+    ArrayList<chatMsgObj> msgList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
         initView();
+        msgList.clear();
+
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,14 +95,21 @@ public class ChatRoomActivity extends RxAppCompatActivity {
         chatMsgObj msgObj = new chatMsgObj();
         msgObj = mgson.fromJson(text,chatMsgObj.class);
         if(msgObj.getCode() == chatAboutConstants.chatMsgObj.CHATMSG_SEND_SUCCESS){
-            msgShowTx.setText(msgObj.getMsg());
+            msgList.add(msgObj);
+            chatAdapter.notifyItemInserted(msgList.size()-1);
+            recyclerView.scrollToPosition(msgList.size()-1);
         }
     }
 
     private void initView(){
         sendMsgBtn = (Button)findViewById(R.id.sendMsg);
         msgTextEt = (EditText) findViewById(R.id.msgText);
-        msgShowTx = (TextView)findViewById(R.id.msgShow);
         msgList = new ArrayList<>();
+        recyclerView = (RecyclerView)findViewById(R.id.chatRecycleView);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        //创建适配器
+        chatAdapter = new ChatAdapter(msgList);
+        recyclerView.setAdapter(chatAdapter);
     }
 }

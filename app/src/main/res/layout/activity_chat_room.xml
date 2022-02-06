@@ -6,7 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ChatRoomActivity"
     android:orientation="vertical">
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/chatRecycleView"
+        ></androidx.recyclerview.widget.RecyclerView>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,16 +22,6 @@
         android:layout_height="wrap_content"
         android:text="发送消息"
         android:id="@+id/sendMsg"
+        android:layout_gravity="bottom"
         ></Button>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="当前房间的用户:"
-        ></TextView>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/msgShow"
-        ></TextView>
-
 </LinearLayout>
