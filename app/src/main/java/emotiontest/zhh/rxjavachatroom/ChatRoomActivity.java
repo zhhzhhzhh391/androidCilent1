@@ -38,7 +38,6 @@ import Loader.userLoader;
 public class ChatRoomActivity extends RxAppCompatActivity {
     private Button sendMsgBtn;
     private EditText msgTextEt;
-    private TextView msgShowTx;
     private LinearLayoutManager layoutManager;
 
     RecyclerView recyclerView;
@@ -74,6 +73,7 @@ public class ChatRoomActivity extends RxAppCompatActivity {
         msgObj.setUserId(mUser.getId());
         String msgJson = mgson.toJson(msgObj);
         RxWebSocket.send(ApiConfig.channelURL,msgJson);
+        msgTextEt.setText("");
     }
 
     private void setChatWsSubscribe(){

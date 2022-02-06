@@ -186,12 +186,9 @@ public class MainActivity extends RxAppCompatActivity {
     }
 
     private void initView(){
-        showMsgText = (TextView)findViewById(R.id.showMessage);
-        getUserListBtn = (Button)findViewById(R.id.getUserList);
         usernameEdit = (EditText)findViewById(R.id.getusernameEdit);
         passwordEdit = (EditText)findViewById(R.id.getpasswordEdit);
         loginBtn = (Button) findViewById(R.id.loginBtn);
-        testSendBtn = (Button)findViewById(R.id.testSend);
     }
 }
 
